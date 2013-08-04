@@ -7,12 +7,18 @@ import java.io.StringReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
 
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 class PrimedTransformer {
+
+	public static final String DEFAULT_TRANSFORMER_FACTORY = "net.sf.saxon.TransformerFactoryImpl";
 
 	/**
 	 * Creates and configures a re-usable instance of DocumentBuilder.
@@ -31,6 +37,43 @@ class PrimedTransformer {
 		documentBuilderFactory.setXIncludeAware(true);
 		documentBuilderFactory.setIgnoringElementContentWhitespace(true);
 		return documentBuilderFactory.newDocumentBuilder();
+
+	}
+
+	/**
+	 * Creates and configures a Transformer generated using the Saxon
+	 * TransformerFactory implementation.
+	 * 
+	 * @throws TransformerConfigurationException
+	 *             when it's not possible to configure the Transformer as
+	 *             required.
+	 */
+	protected static Transformer newTransformer(Source xsl) throws TransformerConfigurationException {
+		return PrimedTransformer.newTransformer(xsl, PrimedTransformer.DEFAULT_TRANSFORMER_FACTORY);
+	}
+
+	/**
+	 * Creates and configures a Transformer generated using the
+	 * TransformerFactory implementation specified.
+	 * 
+	 * @throws TransformerConfigurationException
+	 *             when it's not possible to configure the Transformer as
+	 *             required.
+	 */
+	protected static Transformer newTransformer(Source xsl, String factoryImplId) throws TransformerConfigurationException {
+
+		/*
+		 * Specify that Saxon should be used as the transformer instead of the
+		 * system default
+		 */
+		System.setProperty("javax.xml.transform.TransformerFactory", factoryImplId);
+		TransformerFactory factory = TransformerFactory.newInstance();
+
+		if (xsl != null) {
+			return factory.newTransformer(xsl);
+		}
+
+		return factory.newTransformer();
 
 	}
 

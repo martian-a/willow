@@ -9,6 +9,8 @@ import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -114,5 +116,19 @@ public class TestPrimedTransformer {
 		}
 	
 	}	
+	
+	@Test
+	public void testPrimedTransformer_newTransformer_configurationSaxon() {
+		
+		try {
+			
+			Transformer result = PrimedTransformer.newTransformer(null);			
+			assertEquals(true, result != null);
+			
+		} catch (TransformerConfigurationException e) {
+			fail(e.getMessage());
+		}
+		
+	}
 	
 }
