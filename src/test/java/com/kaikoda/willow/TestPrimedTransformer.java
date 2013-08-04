@@ -10,6 +10,7 @@ import java.io.IOException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.XpathEngine;
 import org.custommonkey.xmlunit.exceptions.XpathException;
@@ -68,5 +69,38 @@ public class TestPrimedTransformer {
 		}
 	
 	}
+	
+	@Test
+	public void testPrimedTransformer_parse_string() {
+		
+		File xmlFile = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world.xml").getFile());
+		assertEquals(true, xmlFile.exists());	
+		
+		try {
+			
+			String xmlString = FileUtils.readFileToString(xmlFile);
+			
+			Document result = PrimedTransformer.parse(xmlString);
+			assertTrue(result != null);
+			
+			assertEquals("document", result.getDocumentElement().getNodeName());
+		
+			XpathEngine	engine = XMLUnit.newXpathEngine();
+			assertEquals("Hello", engine.evaluate("/document/p/span[1]", result));
+			assertEquals("!", engine.evaluate("/document/p/text()[position() = last()]", result));
+			assertEquals("Hello World!", engine.evaluate("/document/p", result));
+			assertEquals(" Hello World! ", engine.evaluate("/document/comment()[1]", result));
+			
+		} catch (ParserConfigurationException e) {					
+			fail(e.getMessage());
+		} catch (XpathException e) {	
+			fail(e.getMessage() + ": " + e.getCause());
+		} catch (SAXException e) {
+			fail(e.getMessage());
+		} catch (IOException e) {
+			fail(e.getMessage());
+		}
+	
+	}	
 	
 }
