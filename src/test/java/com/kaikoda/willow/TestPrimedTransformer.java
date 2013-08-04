@@ -14,6 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.XpathEngine;
 import org.custommonkey.xmlunit.exceptions.XpathException;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -21,6 +23,24 @@ import org.xml.sax.SAXException;
 public class TestPrimedTransformer {
 	
 	public static PrimedTransformer transformer = new PrimedTransformer();
+	public static File sampleFile;
+	public static String sampleString;
+	
+	@BeforeClass
+	public static void setupOnce() throws IOException {
+		
+		sampleFile = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world.xml").getFile());
+		sampleString = FileUtils.readFileToString(sampleFile);
+		
+	}
+	
+	@Before
+	public void setup() {
+		
+		assertEquals(true, sampleFile.exists());
+		assertEquals(true, sampleString != null);
+		
+	}
 	
 	@Test
 	public void testPrimedTransformer_newDocumentBuilder_configuration() {
@@ -40,14 +60,11 @@ public class TestPrimedTransformer {
 	}
 	
 	@Test
-	public void testPrimedTransformer_parseToDocument_inputFile() {
-		
-		File xmlFile = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world.xml").getFile());
-		assertEquals(true, xmlFile.exists());
+	public void testPrimedTransformer_parseToDocument_inputFile() {		
 		
 		try {
 			
-			Document result = PrimedTransformer.parseToDocument(xmlFile);
+			Document result = PrimedTransformer.parseToDocument(sampleFile);
 			assertTrue(result != null);
 			
 			assertEquals("document", result.getDocumentElement().getNodeName());
@@ -72,15 +89,10 @@ public class TestPrimedTransformer {
 	
 	@Test
 	public void testPrimedTransformer_parseToDocument_inputString() {
-		
-		File xmlFile = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world.xml").getFile());
-		assertEquals(true, xmlFile.exists());	
-		
-		try {
+					
+		try {		
 			
-			String xmlString = FileUtils.readFileToString(xmlFile);
-			
-			Document result = PrimedTransformer.parseToDocument(xmlString);
+			Document result = PrimedTransformer.parseToDocument(sampleString);
 			assertTrue(result != null);
 			
 			assertEquals("document", result.getDocumentElement().getNodeName());
