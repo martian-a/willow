@@ -40,14 +40,14 @@ public class TestPrimedTransformer {
 	}
 	
 	@Test
-	public void testPrimedTransformer_parse_file() {
+	public void testPrimedTransformer_parseToDocument_inputFile() {
 		
 		File xmlFile = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world.xml").getFile());
 		assertEquals(true, xmlFile.exists());
 		
 		try {
 			
-			Document result = PrimedTransformer.parse(xmlFile);
+			Document result = PrimedTransformer.parseToDocument(xmlFile);
 			assertTrue(result != null);
 			
 			assertEquals("document", result.getDocumentElement().getNodeName());
@@ -71,7 +71,7 @@ public class TestPrimedTransformer {
 	}
 	
 	@Test
-	public void testPrimedTransformer_parse_string() {
+	public void testPrimedTransformer_parseToDocument_inputString() {
 		
 		File xmlFile = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world.xml").getFile());
 		assertEquals(true, xmlFile.exists());	
@@ -80,7 +80,7 @@ public class TestPrimedTransformer {
 			
 			String xmlString = FileUtils.readFileToString(xmlFile);
 			
-			Document result = PrimedTransformer.parse(xmlString);
+			Document result = PrimedTransformer.parseToDocument(xmlString);
 			assertTrue(result != null);
 			
 			assertEquals("document", result.getDocumentElement().getNodeName());

@@ -48,7 +48,7 @@ class PrimedTransformer {
 	 * @throws ParserConfigurationException
 	 *             if the DocumentBuilder is configured incorrectly.
 	 */
-	public static Document parse(File xml) throws SAXException, IOException, ParserConfigurationException {
+	public static Document parseToDocument(File xml) throws SAXException, IOException, ParserConfigurationException {
 		DocumentBuilder builder = PrimedTransformer.newDocumentBuilder();
 		return builder.parse(xml);
 	}
@@ -66,7 +66,7 @@ class PrimedTransformer {
 	 * @throws ParserConfigurationException
 	 *             if the DocumentBuilder is configured incorrectly.
 	 */
-	public static Document parse(String xml) throws ParserConfigurationException, SAXException, IOException {
+	public static Document parseToDocument(String xml) throws ParserConfigurationException, SAXException, IOException {
 		DocumentBuilder builder = PrimedTransformer.newDocumentBuilder();
 		return builder.parse(new InputSource(new StringReader(xml)));
 	}
