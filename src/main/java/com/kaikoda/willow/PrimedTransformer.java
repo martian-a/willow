@@ -26,6 +26,11 @@ import org.xml.sax.SAXException;
 class PrimedTransformer {
 
 	public static final String DEFAULT_TRANSFORMER_FACTORY = "net.sf.saxon.TransformerFactoryImpl";
+	public static final boolean SET_EXPAND_ENTITY_REFERENCES = true;
+	public static final boolean SET_IGNORING_ELEMENT_CONTENT_WHITESPACE = true;
+	public static final boolean SET_NAMESPACE_AWARE = true;
+	public static final boolean SET_VALIDATING = false;
+	public static final boolean SET_XINCLUDE_AWARE = false;
 
 	/**
 	 * Creates and configures a re-usable instance of DocumentBuilder.
@@ -38,11 +43,11 @@ class PrimedTransformer {
 
 		// Prepare for DOM Document building
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		documentBuilderFactory.setExpandEntityReferences(true);
-		documentBuilderFactory.setNamespaceAware(true);
-		documentBuilderFactory.setValidating(false);
-		documentBuilderFactory.setXIncludeAware(true);
-		documentBuilderFactory.setIgnoringElementContentWhitespace(true);
+		documentBuilderFactory.setExpandEntityReferences(PrimedTransformer.SET_EXPAND_ENTITY_REFERENCES);
+		documentBuilderFactory.setNamespaceAware(PrimedTransformer.SET_NAMESPACE_AWARE);
+		documentBuilderFactory.setValidating(PrimedTransformer.SET_VALIDATING);
+		documentBuilderFactory.setXIncludeAware(PrimedTransformer.SET_XINCLUDE_AWARE);
+		documentBuilderFactory.setIgnoringElementContentWhitespace(PrimedTransformer.SET_IGNORING_ELEMENT_CONTENT_WHITESPACE);
 		return documentBuilderFactory.newDocumentBuilder();
 
 	}

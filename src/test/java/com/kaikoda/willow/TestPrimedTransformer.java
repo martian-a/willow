@@ -61,7 +61,7 @@ public class TestPrimedTransformer {
 			
 			assertEquals(true, result.isNamespaceAware());
 			assertEquals(false, result.isValidating());
-			assertEquals(true, result.isXIncludeAware());
+			assertEquals(false, result.isXIncludeAware());
 			
 		} catch (ParserConfigurationException e) {					
 			fail(e.getMessage());
