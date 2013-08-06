@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <document>
     <!-- Hello World! -->
     <p><span class="greeting">Hello</span><span class="delimiter"> </span><span class="audience">World</span>!</p>    
