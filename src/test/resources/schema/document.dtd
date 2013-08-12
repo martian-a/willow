@@ -1,0 +1,6 @@
+<!ENTITY helloworld SYSTEM "entities/hello_world.txt">
+
+<!ELEMENT document (p) >
+<!ELEMENT p (#PCDATA|span)* >
+<!ELEMENT span (#PCDATA|span)* >
+<!ATTLIST span class CDATA #IMPLIED >

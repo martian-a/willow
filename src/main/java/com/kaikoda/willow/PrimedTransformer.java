@@ -39,13 +39,31 @@ class PrimedTransformer {
 	private final DocumentBuilderFactory documentBuilderFactory;
 
 	/**
-	 * Default constructor.
+	 * The DocumentBuilder used when creating DOM documents.
 	 */
-	public PrimedTransformer() {
+	private final DocumentBuilder documentBuilder;
+
+	
+	/**
+	 * Default constructor.
+	 * @throws ParserConfigurationException if there's a problem instantiating a DocumentBuilder.
+	 */
+	public PrimedTransformer() throws ParserConfigurationException {
 
 		// Configure and store a re-usable DocumentBuilderFactory
 		this.documentBuilderFactory = PrimedTransformer.newDocumentBuilderFactory();
+		
+		// Instantiate and store a re-usable DocumentBuilder
+		this.documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
 
+	}
+	
+	
+	/**
+	 * @return the DocumentBuilder used by this instance of PrimedTransformer.
+	 */
+	public DocumentBuilder getDocumentBuilder() {
+		return this.documentBuilder;
 	}
 
 	/**

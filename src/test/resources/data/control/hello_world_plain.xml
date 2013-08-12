@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-model href="../../schema/document.dtd" type="application/xml-dtd"?>
+<!DOCTYPE document PUBLIC "-//KAIKODA//DTD DOCUMENT 1.0//EN" "../../schema/document.dtd">
+<document>
+    <!-- Hello World! -->
+    <p>Hello World!</p>
+</document>

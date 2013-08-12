@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<?xml-model href="../../schema/document.dtd" type="application/xml-dtd"?>
 <document>
     <!-- Hello World! -->
     <p><span class="greeting">Hello</span><span class="delimiter"> </span><span class="audience">World</span>!</p>    

@@ -1,10 +1,10 @@
 package com.kaikoda.willow;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,25 +32,53 @@ import org.xml.sax.SAXException;
 
 public class TestPrimedTransformer {
 	
-	public static PrimedTransformer transformer = new PrimedTransformer();
-	public static File sampleFile;
-	public static String sampleString;
+	public static PrimedTransformer transformer;
+	
+	public static File sampleFileHelloWorldSemantic;
+	public static String sampleStringHelloWorldSemantic;
+	public static File sampleFileCharacterEntityReferences;
+	public static String sampleStringCharacterEntityReferences;
+	public static File sampleFileEntityReferences;
+	public static String sampleStringEntityReferences;
+	public static File sampleFileHelloWorldPlain;
+	public static String sampleStringHelloWorldPlain;
 	public static File xslReverse;
 	
 	@BeforeClass
-	public static void setupOnce() throws IOException {
+	public static void setupOnce() throws IOException, ParserConfigurationException {
 		
-		sampleFile = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world.xml").getFile());
-		sampleString = FileUtils.readFileToString(sampleFile);
+		transformer = new PrimedTransformer();
+		
+		sampleFileHelloWorldSemantic = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world_semantic.xml").getFile());
+		sampleStringHelloWorldSemantic = FileUtils.readFileToString(sampleFileHelloWorldSemantic);	
+		
+		sampleFileCharacterEntityReferences = new File(TestPrimedTransformer.class.getResource("/data/source/character_entity_references.xml").getFile());
+		sampleStringCharacterEntityReferences = FileUtils.readFileToString(sampleFileCharacterEntityReferences);
+		
+		sampleFileEntityReferences = new File(TestPrimedTransformer.class.getResource("/data/source/entity_references.xml").getFile());
+		sampleStringEntityReferences = FileUtils.readFileToString(sampleFileEntityReferences);	
+		
+		sampleFileHelloWorldPlain = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world_plain.xml").getFile());
+		sampleStringHelloWorldPlain = FileUtils.readFileToString(sampleFileHelloWorldPlain);	
+		
 		xslReverse = new File(TestPrimedTransformer.class.getResource("/xsl/reverse.xsl").getFile());
 		
 	}
 	
 	@Before
-	public void setup() {
+	public void setup() {	
 		
-		assertEquals(true, sampleFile.exists());
-		assertEquals(true, sampleString != null);
+		assertEquals(true, transformer != null);
+		assertEquals(true, sampleFileHelloWorldSemantic.exists());
+		assertEquals(true, sampleStringHelloWorldSemantic != null);
+		
+		assertEquals(true, sampleFileCharacterEntityReferences.exists());
+		assertEquals(true, sampleStringCharacterEntityReferences != null);
+		
+		assertEquals(true, sampleFileHelloWorldPlain.exists());
+		assertEquals(true, sampleStringHelloWorldPlain != null);
+		
+		assertEquals(true, xslReverse.exists());		
 		
 	}
 	
@@ -87,7 +115,7 @@ public class TestPrimedTransformer {
 		
 		try {
 			
-			Document result = PrimedTransformer.parseToDocument(sampleFile);
+			Document result = PrimedTransformer.parseToDocument(sampleFileHelloWorldSemantic);
 			assertTrue(result != null);
 			
 			assertEquals("document", result.getDocumentElement().getNodeName());
@@ -115,7 +143,7 @@ public class TestPrimedTransformer {
 					
 		try {		
 			
-			Document result = PrimedTransformer.parseToDocument(sampleString);
+			Document result = PrimedTransformer.parseToDocument(sampleStringHelloWorldSemantic);
 			assertTrue(result != null);
 			
 			assertEquals("document", result.getDocumentElement().getNodeName());
@@ -144,7 +172,7 @@ public class TestPrimedTransformer {
 		try {					
 			
 			// Prepare an XML String for transformation
-			Source xmlSource = new DOMSource(PrimedTransformer.parseToDocument(sampleString));
+			Source xmlSource = new DOMSource(PrimedTransformer.parseToDocument(sampleStringHelloWorldSemantic));
 			
 			// Prepare a container to hold the result of the transformation
 			StringWriter writer = new StringWriter();
@@ -158,7 +186,7 @@ public class TestPrimedTransformer {
 
 			XMLUnit.setIgnoreWhitespace(true);
 			
-			assertXMLEqual(sampleString, resultString);		
+			assertXMLEqual(sampleStringHelloWorldSemantic, resultString);		
 			
 		} catch (ParserConfigurationException e) {					
 			fail(e.getMessage());
@@ -178,7 +206,7 @@ public class TestPrimedTransformer {
 		try {					
 			
 			// Prepare an XML String for transformation
-			Source xmlSource = new DOMSource(PrimedTransformer.parseToDocument(sampleString));
+			Source xmlSource = new DOMSource(PrimedTransformer.parseToDocument(sampleStringHelloWorldSemantic));
 			
 			// Prepare an XSLT Stylesheet to implement the transformation
 			Source xslSource = new DOMSource(PrimedTransformer.parseToDocument(xslReverse));
@@ -188,7 +216,7 @@ public class TestPrimedTransformer {
 			StreamResult result = new StreamResult(writer);
 			
 			// Prepare the control content
-			String xmlExpected = FileUtils.readFileToString(new File(TestPrimedTransformer.class.getResource("/data/control/hello_world_reversed.xml").getFile()));
+			String xmlExpected = FileUtils.readFileToString(new File(TestPrimedTransformer.class.getResource("/data/control/hello_world_semantic_reversed.xml").getFile()));
 			
 			// Execute the transformation
 			PrimedTransformer.transform(xmlSource, xslSource, result, null, null);		
@@ -217,10 +245,10 @@ public class TestPrimedTransformer {
 		
 		try {		
 			
-			String result = PrimedTransformer.parseToString(sampleFile);
+			String result = PrimedTransformer.parseToString(sampleFileHelloWorldSemantic);
 			assertTrue(result != null);
 			
-			assertXMLEqual(sampleString, result);
+			assertXMLEqual(sampleStringHelloWorldSemantic, result);
 			
 		} catch (ParserConfigurationException e) {					
 			fail(e.getMessage());
@@ -239,12 +267,12 @@ public class TestPrimedTransformer {
 		
 		try {		
 			
-			Document sampleDocument = PrimedTransformer.parseToDocument(sampleFile);
+			Document sampleDocument = PrimedTransformer.parseToDocument(sampleFileHelloWorldSemantic);
 			
 			String result = PrimedTransformer.parseToString(sampleDocument);
 			assertTrue(result != null);
 			
-			assertXMLEqual(sampleString, result);
+			assertXMLEqual(sampleStringHelloWorldSemantic, result);
 			
 		} catch (ParserConfigurationException e) {					
 			fail(e.getMessage());
@@ -286,6 +314,34 @@ public class TestPrimedTransformer {
 		assertEquals(PrimedTransformer.SET_VALIDATING, initialDocumentBuilderFactory.isValidating());
 		assertEquals(PrimedTransformer.SET_XINCLUDE_AWARE, initialDocumentBuilderFactory.isXIncludeAware());
 		assertEquals(PrimedTransformer.SET_IGNORING_ELEMENT_CONTENT_WHITESPACE, initialDocumentBuilderFactory.isIgnoringElementContentWhitespace());
+		
+		/*
+		 *  Check the configuration of the DocumentBuilder
+		 *  immediately after an instance of PrimedTransformer has been constructed. 
+		 */		
+		DocumentBuilder initialDocumentBuilder = transformer.getDocumentBuilder();		
+		assertNotNull(initialDocumentBuilder);
+		assertEquals(PrimedTransformer.SET_NAMESPACE_AWARE, initialDocumentBuilder.isNamespaceAware());
+		assertEquals(PrimedTransformer.SET_VALIDATING, initialDocumentBuilder.isValidating());
+		assertEquals(PrimedTransformer.SET_XINCLUDE_AWARE, initialDocumentBuilder.isXIncludeAware());	
+		
+		// Check that the DocumentBuilder is expanding character entity references.
+		try {
+			assertXMLEqual(initialDocumentBuilder.parse(sampleFileHelloWorldPlain), initialDocumentBuilder.parse(sampleFileCharacterEntityReferences));
+		} catch(IOException e) {
+			fail(e.getMessage());
+		} catch (SAXException e) {
+			fail(e.getMessage());
+		}
+		
+		// Check that the DocumentBuilder isn't expanding entity references.		
+		try {
+			assertXMLEqual(initialDocumentBuilder.parse(sampleFileHelloWorldPlain), initialDocumentBuilder.parse(sampleFileEntityReferences));
+		} catch(IOException e) {
+			fail(e.getMessage());
+		} catch (SAXException e) {
+			fail(e.getMessage());
+		}		
 		
 	}
 	

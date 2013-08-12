@@ -26,6 +26,8 @@
         <includes>
           <include>**/*.xml</include>
           <include>**/*.xsl</include>
+          <include>**/*.dtd</include>
+          <include>**/*.txt</include>
         </includes>
         <excludes>
           <exclude>*/*.git*</exclude>
