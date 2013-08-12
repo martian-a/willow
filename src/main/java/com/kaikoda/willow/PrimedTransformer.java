@@ -33,6 +33,30 @@ class PrimedTransformer {
 	public static final boolean SET_XINCLUDE_AWARE = false;
 
 	/**
+	 * The DocumentBuilderFactory used when instantiating a new DocumentBuilder
+	 * for this instance of PrimedTransformer.
+	 */
+	private final DocumentBuilderFactory documentBuilderFactory;
+
+	/**
+	 * Default constructor.
+	 */
+	public PrimedTransformer() {
+
+		// Configure and store a re-usable DocumentBuilderFactory
+		this.documentBuilderFactory = PrimedTransformer.newDocumentBuilderFactory();
+
+	}
+
+	/**
+	 * @return the DocumentBuilderFactory used when insantiating a new
+	 *         DocumentBuilder for this instance of PrimedTransformer.
+	 */
+	public DocumentBuilderFactory getDocumentBuilderFactory() {
+		return this.documentBuilderFactory;
+	}
+
+	/**
 	 * Creates and configures a re-usable instance of DocumentBuilder.
 	 * 
 	 * @throws ParserConfigurationException
@@ -42,13 +66,27 @@ class PrimedTransformer {
 	public static DocumentBuilder newDocumentBuilder() throws ParserConfigurationException {
 
 		// Prepare for DOM Document building
+		DocumentBuilderFactory documentBuilderFactory = PrimedTransformer.newDocumentBuilderFactory();
+		return documentBuilderFactory.newDocumentBuilder();
+
+	}
+
+	/**
+	 * Creates and configures a re-usable instance of DocumentBuilderFactory.
+	 * 
+	 * @return a DocumentBuilderFactory configured using the defaults specified
+	 *         in this class.
+	 */
+	public static DocumentBuilderFactory newDocumentBuilderFactory() {
+
+		// Prepare for DOM Document building
 		DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setExpandEntityReferences(PrimedTransformer.SET_EXPAND_ENTITY_REFERENCES);
 		documentBuilderFactory.setNamespaceAware(PrimedTransformer.SET_NAMESPACE_AWARE);
 		documentBuilderFactory.setValidating(PrimedTransformer.SET_VALIDATING);
 		documentBuilderFactory.setXIncludeAware(PrimedTransformer.SET_XINCLUDE_AWARE);
 		documentBuilderFactory.setIgnoringElementContentWhitespace(PrimedTransformer.SET_IGNORING_ELEMENT_CONTENT_WHITESPACE);
-		return documentBuilderFactory.newDocumentBuilder();
+		return documentBuilderFactory;
 
 	}
 

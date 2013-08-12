@@ -1,6 +1,7 @@
 package com.kaikoda.willow;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.custommonkey.xmlunit.XMLAssert.assertXMLEqual;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -53,15 +55,26 @@ public class TestPrimedTransformer {
 	}
 	
 	@Test
+	public void testPrimedTransformer_defaults() {
+		
+		assertEquals(true, PrimedTransformer.SET_EXPAND_ENTITY_REFERENCES);
+		assertEquals(true, PrimedTransformer.SET_NAMESPACE_AWARE);
+		assertEquals(false, PrimedTransformer.SET_VALIDATING);
+		assertEquals(false, PrimedTransformer.SET_XINCLUDE_AWARE);
+		assertEquals(true, PrimedTransformer.SET_IGNORING_ELEMENT_CONTENT_WHITESPACE);
+		
+	}
+	
+	@Test
 	public void testPrimedTransformer_newDocumentBuilder_configuration() {
 
 		try {
 			
 			DocumentBuilder result = PrimedTransformer.newDocumentBuilder();
 			
-			assertEquals(true, result.isNamespaceAware());
-			assertEquals(false, result.isValidating());
-			assertEquals(false, result.isXIncludeAware());
+			assertEquals(PrimedTransformer.SET_NAMESPACE_AWARE, result.isNamespaceAware());
+			assertEquals(PrimedTransformer.SET_VALIDATING, result.isValidating());
+			assertEquals(PrimedTransformer.SET_XINCLUDE_AWARE, result.isXIncludeAware());			
 			
 		} catch (ParserConfigurationException e) {					
 			fail(e.getMessage());
@@ -256,6 +269,23 @@ public class TestPrimedTransformer {
 		} catch (TransformerConfigurationException e) {
 			fail(e.getMessage());
 		}
+		
+	}
+	
+	@Test
+	public void testPrimedTransformer_configurationDefault() {
+		
+		/*
+		 *  Check the configuration of the DocumentBuilderFactory
+		 *  immediately after an instance of PrimedTransformer has been constructed. 
+		 */		
+		DocumentBuilderFactory initialDocumentBuilderFactory = transformer.getDocumentBuilderFactory();		
+		assertNotNull(initialDocumentBuilderFactory);
+		assertEquals(PrimedTransformer.SET_EXPAND_ENTITY_REFERENCES, initialDocumentBuilderFactory.isExpandEntityReferences());
+		assertEquals(PrimedTransformer.SET_NAMESPACE_AWARE, initialDocumentBuilderFactory.isNamespaceAware());
+		assertEquals(PrimedTransformer.SET_VALIDATING, initialDocumentBuilderFactory.isValidating());
+		assertEquals(PrimedTransformer.SET_XINCLUDE_AWARE, initialDocumentBuilderFactory.isXIncludeAware());
+		assertEquals(PrimedTransformer.SET_IGNORING_ELEMENT_CONTENT_WHITESPACE, initialDocumentBuilderFactory.isIgnoringElementContentWhitespace());
 		
 	}
 	
