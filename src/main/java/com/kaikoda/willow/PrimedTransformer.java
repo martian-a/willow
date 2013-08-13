@@ -35,41 +35,41 @@ class PrimedTransformer {
 	public static final boolean SET_XINCLUDE_AWARE = false;
 
 	/**
+	 * The DocumentBuilder used when creating DOM documents.
+	 */
+	private final DocumentBuilder documentBuilder;
+
+	/**
 	 * The DocumentBuilderFactory used when instantiating a new DocumentBuilder
 	 * for this instance of PrimedTransformer.
 	 */
 	private final DocumentBuilderFactory documentBuilderFactory;
 
 	/**
-	 * The DocumentBuilder used when creating DOM documents.
-	 */
-	private final DocumentBuilder documentBuilder;
-	
-	/**
-	 * The TransformerFactory used when instantiating a new Transformer
-	 * for this instance of PrimedTransformer.
+	 * The TransformerFactory used when instantiating a new Transformer for this
+	 * instance of PrimedTransformer.
 	 */
 	private final TransformerFactory transformerFactory;
 
-	
 	/**
 	 * Default constructor.
-	 * @throws ParserConfigurationException if there's a problem instantiating a DocumentBuilder.
+	 * 
+	 * @throws ParserConfigurationException
+	 *             if there's a problem instantiating a DocumentBuilder.
 	 */
 	public PrimedTransformer() throws ParserConfigurationException {
 
 		// Configure and store a re-usable DocumentBuilderFactory
 		this.documentBuilderFactory = PrimedTransformer.newDocumentBuilderFactory();
-		
+
 		// Instantiate and store a re-usable DocumentBuilder
 		this.documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
-		
+
 		// Configure and store a re-usable TransformerFactory
 		this.transformerFactory = PrimedTransformer.newTransformerFactory();
 
 	}
-	
-	
+
 	/**
 	 * @return the DocumentBuilder used by this instance of PrimedTransformer.
 	 */
@@ -84,10 +84,10 @@ class PrimedTransformer {
 	public DocumentBuilderFactory getDocumentBuilderFactory() {
 		return this.documentBuilderFactory;
 	}
-	
+
 	/**
-	 * @return the TransformerFactory used when instantiating a new 
-	 * 			Transformer for this instance of PrimedTransformer.
+	 * @return the TransformerFactory used when instantiating a new Transformer
+	 *         for this instance of PrimedTransformer.
 	 */
 	public TransformerFactory getTransformerFactory() {
 		return this.transformerFactory;
@@ -162,32 +162,29 @@ class PrimedTransformer {
 		return factory.newTransformer();
 
 	}
-	
-	
+
 	/**
 	 * Creates and configures an instance of the default TransformerFactory
 	 */
 	public static TransformerFactory newTransformerFactory() {
-		TransformerFactory factory = PrimedTransformer.newTransformerFactory(DEFAULT_TRANSFORMER_FACTORY);
-		
-		factory.setAttribute(FeatureKeys.XINCLUDE, PrimedTransformer.SET_XINCLUDE_AWARE);			
+		TransformerFactory factory = PrimedTransformer.newTransformerFactory(PrimedTransformer.DEFAULT_TRANSFORMER_FACTORY);
+
+		factory.setAttribute(FeatureKeys.XINCLUDE, PrimedTransformer.SET_XINCLUDE_AWARE);
 		factory.setAttribute(FeatureKeys.VALIDATION_WARNINGS, !PrimedTransformer.SET_VALIDATING);
-		
+
 		return factory;
 	}
-	
-	
+
 	/**
 	 * Creates and configures an instance of the TransformerFactory
-	 * implementation specified. 
+	 * implementation specified.
 	 */
 	public static TransformerFactory newTransformerFactory(String factoryImplId) {
 
 		System.setProperty("javax.xml.transform.TransformerFactory", factoryImplId);
 		return TransformerFactory.newInstance();
-		
+
 	}
-	
 
 	/**
 	 * Parses the XML file specified and returns its contents as a DOM Document.
