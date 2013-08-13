@@ -19,6 +19,8 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import net.sf.saxon.lib.FeatureKeys;
+
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -42,6 +44,12 @@ class PrimedTransformer {
 	 * The DocumentBuilder used when creating DOM documents.
 	 */
 	private final DocumentBuilder documentBuilder;
+	
+	/**
+	 * The TransformerFactory used when instantiating a new Transformer
+	 * for this instance of PrimedTransformer.
+	 */
+	private final TransformerFactory transformerFactory;
 
 	
 	/**
@@ -55,6 +63,9 @@ class PrimedTransformer {
 		
 		// Instantiate and store a re-usable DocumentBuilder
 		this.documentBuilder = this.documentBuilderFactory.newDocumentBuilder();
+		
+		// Configure and store a re-usable TransformerFactory
+		this.transformerFactory = PrimedTransformer.newTransformerFactory();
 
 	}
 	
@@ -67,11 +78,19 @@ class PrimedTransformer {
 	}
 
 	/**
-	 * @return the DocumentBuilderFactory used when insantiating a new
+	 * @return the DocumentBuilderFactory used when instantiating a new
 	 *         DocumentBuilder for this instance of PrimedTransformer.
 	 */
 	public DocumentBuilderFactory getDocumentBuilderFactory() {
 		return this.documentBuilderFactory;
+	}
+	
+	/**
+	 * @return the TransformerFactory used when instantiating a new 
+	 * 			Transformer for this instance of PrimedTransformer.
+	 */
+	public TransformerFactory getTransformerFactory() {
+		return this.transformerFactory;
 	}
 
 	/**
@@ -134,8 +153,7 @@ class PrimedTransformer {
 		 * Specify that Saxon should be used as the transformer instead of the
 		 * system default
 		 */
-		System.setProperty("javax.xml.transform.TransformerFactory", factoryImplId);
-		TransformerFactory factory = TransformerFactory.newInstance();
+		TransformerFactory factory = PrimedTransformer.newTransformerFactory();
 
 		if (xsl != null) {
 			return factory.newTransformer(xsl);
@@ -144,6 +162,32 @@ class PrimedTransformer {
 		return factory.newTransformer();
 
 	}
+	
+	
+	/**
+	 * Creates and configures an instance of the default TransformerFactory
+	 */
+	public static TransformerFactory newTransformerFactory() {
+		TransformerFactory factory = PrimedTransformer.newTransformerFactory(DEFAULT_TRANSFORMER_FACTORY);
+		
+		factory.setAttribute(FeatureKeys.XINCLUDE, PrimedTransformer.SET_XINCLUDE_AWARE);			
+		factory.setAttribute(FeatureKeys.VALIDATION_WARNINGS, !PrimedTransformer.SET_VALIDATING);
+		
+		return factory;
+	}
+	
+	
+	/**
+	 * Creates and configures an instance of the TransformerFactory
+	 * implementation specified. 
+	 */
+	public static TransformerFactory newTransformerFactory(String factoryImplId) {
+
+		System.setProperty("javax.xml.transform.TransformerFactory", factoryImplId);
+		return TransformerFactory.newInstance();
+		
+	}
+	
 
 	/**
 	 * Parses the XML file specified and returns its contents as a DOM Document.

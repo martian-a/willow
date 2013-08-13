@@ -17,8 +17,11 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+
+import net.sf.saxon.lib.FeatureKeys;
 
 import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.XMLUnit;
@@ -341,8 +344,17 @@ public class TestPrimedTransformer {
 			fail(e.getMessage());
 		} catch (SAXException e) {
 			fail(e.getMessage());
-		}		
+		}
 		
+		/*
+		 *  Check the configuration of the TransformerFactory
+		 *  immediately after an instance of PrimedTransformer has been constructed. 
+		 */		
+		TransformerFactory initialTransformerFactory = transformer.getTransformerFactory();		
+		assertNotNull(initialTransformerFactory);
+		assertEquals(PrimedTransformer.SET_XINCLUDE_AWARE, initialTransformerFactory.getAttribute(FeatureKeys.XINCLUDE));
+		assertEquals(!PrimedTransformer.SET_VALIDATING, initialTransformerFactory.getAttribute(FeatureKeys.VALIDATION_WARNINGS));
+				
 	}
 	
 }
