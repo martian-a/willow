@@ -9,6 +9,7 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -24,6 +25,7 @@ import javax.xml.transform.stream.StreamResult;
 import net.sf.saxon.lib.FeatureKeys;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.xerces.util.XMLCatalogResolver;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.custommonkey.xmlunit.XpathEngine;
 import org.custommonkey.xmlunit.exceptions.XpathException;
@@ -33,47 +35,163 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+/**
+ * @author Sheila Ellen Thomson
+ *
+ */
 public class TestPrimedTransformer {
 	
+	/**
+	 * The default instance of PrimedTransformer that will be used during these tests.
+	 */
 	public static PrimedTransformer transformer;
 	
+	/**
+	 * A sample XML file for use during tests.
+	 */
 	public static File sampleFileHelloWorldSemantic;
+	
+	/**
+	 * A sample XML string for use during tests.
+	 */
 	public static String sampleStringHelloWorldSemantic;
+	
+	/**
+	 * A sample XML file for use during tests.
+	 */
+	public static File sampleFileHelloWorldSemanticReversed;
+	
+	/**
+	 * A sample XML string for use during tests.
+	 */
+	public static String sampleStringHelloWorldSemanticReversed;
+	
+	/**
+	 * A sample XML string for use during tests.
+	 */
 	public static File sampleFileCharacterEntityReferences;
+	
+	/**
+	 * A sample XML string for use during tests.
+	 */
 	public static String sampleStringCharacterEntityReferences;
+	
+	/**
+	 * A sample XML string for use during tests.
+	 */
 	public static File sampleFileEntityReferences;
+	
+	/**
+	 * A sample XML string for use during tests.
+	 */
 	public static String sampleStringEntityReferences;
+	
+	/**
+	 * A sample XML string for use during tests.
+	 */
 	public static File sampleFileHelloWorldPlain;
+	
+	/**
+	 * A sample XML string for use during tests.
+	 */
 	public static String sampleStringHelloWorldPlain;
+	
+	/**
+	 * An XSL stylesheet that reverses the order of elements.
+	 */
 	public static File xslReverse;
 	
+	/**
+	 * An XSL stylesheet that wraps a message in an element.  The message and wrapper element name can both be set via parameters.
+	 */
+	public static File xslWrapMessage;
+	
+	/**
+	 * An XSL stylesheet designed to generate a fatal TransformerException.
+	 */
+	public static File xslError;
+	
+	/**
+	 * A sample file containing a basic XML prolog.
+	 */
+	public static File prologFile;
+	
+	/**
+	 * A basic XML prolog string.
+	 */
+	public static String prologString;
+	
+	/**
+	 * The default entity resolver used during tests.
+	 */
+	public static XMLCatalogResolver resolver;
+	
+	/**
+	 * The default OASIS catalog used during tests.
+	 */
+	public static File catalog;
+	
+	/**
+	 * Test environment configuration steps.
+	 */
 	@BeforeClass
-	public static void setupOnce() throws IOException, ParserConfigurationException {
-		
-		transformer = new PrimedTransformer();
-		
+	public static void setupOnce() {
+
 		sampleFileHelloWorldSemantic = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world_semantic.xml").getFile());
-		sampleStringHelloWorldSemantic = FileUtils.readFileToString(sampleFileHelloWorldSemantic);	
-		
+		sampleFileHelloWorldSemanticReversed = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world_semantic_reversed.xml").getFile());
 		sampleFileCharacterEntityReferences = new File(TestPrimedTransformer.class.getResource("/data/source/character_entity_references.xml").getFile());
-		sampleStringCharacterEntityReferences = FileUtils.readFileToString(sampleFileCharacterEntityReferences);
-		
 		sampleFileEntityReferences = new File(TestPrimedTransformer.class.getResource("/data/source/entity_references.xml").getFile());
-		sampleStringEntityReferences = FileUtils.readFileToString(sampleFileEntityReferences);	
-		
 		sampleFileHelloWorldPlain = new File(TestPrimedTransformer.class.getResource("/data/control/hello_world_plain.xml").getFile());
-		sampleStringHelloWorldPlain = FileUtils.readFileToString(sampleFileHelloWorldPlain);	
-		
 		xslReverse = new File(TestPrimedTransformer.class.getResource("/xsl/reverse.xsl").getFile());
+		xslError = new File(TestPrimedTransformer.class.getResource("/xsl/error.xsl").getFile());
+		prologFile = new File(TestPrimedTransformer.class.getResource("/data/control/prolog.txt").getFile());
+		xslWrapMessage = new File(TestPrimedTransformer.class.getResource("/xsl/wrap_message.xsl").getFile());
+		catalog = new File(TestPrimedTransformer.class.getResource("/schema/catalog.xml").getFile());
+		
+		try {
+			
+			transformer = new PrimedTransformer();
+			
+			sampleStringHelloWorldSemantic = FileUtils.readFileToString(sampleFileHelloWorldSemantic);
+			sampleStringHelloWorldSemanticReversed = FileUtils.readFileToString(sampleFileHelloWorldSemanticReversed);
+			sampleStringCharacterEntityReferences = FileUtils.readFileToString(sampleFileCharacterEntityReferences);
+			sampleStringEntityReferences = FileUtils.readFileToString(sampleFileEntityReferences);					
+			sampleStringHelloWorldPlain = FileUtils.readFileToString(sampleFileHelloWorldPlain);
+			prologString = FileUtils.readFileToString(prologFile);
+			
+		} catch(ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		resolver = new XMLCatalogResolver();
+		resolver.setCatalogList(new String[]{catalog.toURI().toString()});		
+		transformer.setCatalogResolver(resolver);
 		
 	}
 	
+	/**
+	 * Before each test, check that all is as expected.
+	 */
 	@Before
 	public void setup() {	
 		
+		XMLUnit.setIgnoreWhitespace(true);
+		XMLUnit.setControlEntityResolver(resolver);
+		XMLUnit.setTestEntityResolver(resolver);
+		
 		assertEquals(true, transformer != null);
+		assertEquals(true, resolver != null);
+		assertEquals(true, catalog.exists());
+		
 		assertEquals(true, sampleFileHelloWorldSemantic.exists());
 		assertEquals(true, sampleStringHelloWorldSemantic != null);
+		
+		assertEquals(true, sampleFileHelloWorldSemanticReversed.exists());
+		assertEquals(true, sampleStringHelloWorldSemanticReversed != null);
 		
 		assertEquals(true, sampleFileCharacterEntityReferences.exists());
 		assertEquals(true, sampleStringCharacterEntityReferences != null);
@@ -81,10 +199,18 @@ public class TestPrimedTransformer {
 		assertEquals(true, sampleFileHelloWorldPlain.exists());
 		assertEquals(true, sampleStringHelloWorldPlain != null);
 		
-		assertEquals(true, xslReverse.exists());		
+		assertEquals(true, xslReverse.exists());
+		assertEquals(true, xslError.exists());
+		assertEquals(true, xslWrapMessage.exists());
+		
+		assertEquals(true, prologFile.exists());
+		assertEquals(true, prologString != null);
 		
 	}
 	
+	/**
+	 * Check that the default values stored in the PrimedTransformer class are those expected.
+	 */
 	@Test
 	public void testPrimedTransformer_defaults() {
 		
@@ -96,6 +222,9 @@ public class TestPrimedTransformer {
 		
 	}
 	
+	/**
+	 * Check that the default configuration for a DocumentBuilder created using a PrimedTransformer is as expected.
+	 */
 	@Test
 	public void testPrimedTransformer_newDocumentBuilder_configuration() {
 
@@ -113,12 +242,15 @@ public class TestPrimedTransformer {
 		
 	}
 	
+	/**
+	 * Check that the PrimedTransformer correctly converts an XML File into a DOM Document.
+	 */
 	@Test
 	public void testPrimedTransformer_parseToDocument_inputFile() {		
 		
 		try {
 			
-			Document result = PrimedTransformer.parseToDocument(sampleFileHelloWorldSemantic);
+			Document result = transformer.parseToDocument(sampleFileHelloWorldSemantic);
 			assertTrue(result != null);
 			
 			assertEquals("document", result.getDocumentElement().getNodeName());
@@ -141,12 +273,15 @@ public class TestPrimedTransformer {
 	
 	}
 	
+	/**
+	 * Check that the PrimedTransformer correctly converts an XML String into a DOM Document.
+	 */
 	@Test
 	public void testPrimedTransformer_parseToDocument_inputString() {
 					
 		try {		
 			
-			Document result = PrimedTransformer.parseToDocument(sampleStringHelloWorldSemantic);
+			Document result = transformer.parseToDocument(sampleStringHelloWorldSemantic);
 			assertTrue(result != null);
 			
 			assertEquals("document", result.getDocumentElement().getNodeName());
@@ -169,20 +304,23 @@ public class TestPrimedTransformer {
 	
 	}	
 	
+	/**
+	 * Check that the PrimedTransformer correctly executes a transformation using the XML supplied but no XSL Stylesheet.
+	 */
 	@Test
 	public void testPrimedTransformer_transform_inputXSL_null() {
 					
 		try {					
 			
 			// Prepare an XML String for transformation
-			Source xmlSource = new DOMSource(PrimedTransformer.parseToDocument(sampleStringHelloWorldSemantic));
+			Source xmlSource = new DOMSource(transformer.parseToDocument(sampleStringHelloWorldSemantic));
 			
 			// Prepare a container to hold the result of the transformation
 			StringWriter writer = new StringWriter();
 			StreamResult result = new StreamResult(writer);
 			
 			// Execute the transformation
-			PrimedTransformer.transform(xmlSource, null, result, null, null);		
+			transformer.transform(xmlSource, null, result, null, null);		
 			
 			// Extract the result of the transformation from the container
 			String resultString = writer.toString();
@@ -203,16 +341,19 @@ public class TestPrimedTransformer {
 	
 	}
 	
+	/**
+	 * Check that the PrimedTransformer correctly executes a transformation using the XML and XSL Stylesheets specified.
+	 */
 	@Test
 	public void testPrimedTransformer_transform_inputXSL_reverse() {
 					
 		try {					
 			
 			// Prepare an XML String for transformation
-			Source xmlSource = new DOMSource(PrimedTransformer.parseToDocument(sampleStringHelloWorldSemantic));
+			Source xmlSource = new DOMSource(transformer.parseToDocument(sampleStringHelloWorldSemantic));
 			
 			// Prepare an XSLT Stylesheet to implement the transformation
-			Source xslSource = new DOMSource(PrimedTransformer.parseToDocument(xslReverse));
+			Source xslSource = new DOMSource(transformer.parseToDocument(xslReverse));
 			
 			// Prepare a container to hold the result of the transformation
 			StringWriter writer = new StringWriter();
@@ -222,12 +363,10 @@ public class TestPrimedTransformer {
 			String xmlExpected = FileUtils.readFileToString(new File(TestPrimedTransformer.class.getResource("/data/control/hello_world_semantic_reversed.xml").getFile()));
 			
 			// Execute the transformation
-			PrimedTransformer.transform(xmlSource, xslSource, result, null, null);		
+			transformer.transform(xmlSource, xslSource, result, null, null);		
 			
 			// Extract the result of the transformation from the container
 			String resultString = writer.toString();
-
-			XMLUnit.setIgnoreWhitespace(true);
 			
 			assertXMLEqual(xmlExpected, resultString);		
 			
@@ -243,12 +382,15 @@ public class TestPrimedTransformer {
 	
 	}
 
+	/**
+	 * Check that the PrimedTransformer correctly converts an XML File into an XML String.
+	 */
 	@Test
 	public void testPrimedTransformer_parseToString_inputFile() {		
 		
 		try {		
 			
-			String result = PrimedTransformer.parseToString(sampleFileHelloWorldSemantic);
+			String result = transformer.parseToString(sampleFileHelloWorldSemantic);
 			assertTrue(result != null);
 			
 			assertXMLEqual(sampleStringHelloWorldSemantic, result);
@@ -265,14 +407,17 @@ public class TestPrimedTransformer {
 	
 	}
 	
+	/**
+	 * Check that the PrimedTransformer correctly converts a DOM Document into an XML String.
+	 */
 	@Test
 	public void testPrimedTransformer_parseToString_inputDocument() {		
 		
 		try {		
 			
-			Document sampleDocument = PrimedTransformer.parseToDocument(sampleFileHelloWorldSemantic);
+			Document sampleDocument = transformer.parseToDocument(sampleFileHelloWorldSemantic);
 			
-			String result = PrimedTransformer.parseToString(sampleDocument);
+			String result = transformer.parseToString(sampleDocument);
 			assertTrue(result != null);
 			
 			assertXMLEqual(sampleStringHelloWorldSemantic, result);
@@ -289,20 +434,195 @@ public class TestPrimedTransformer {
 	
 	}
 	
+	/**
+	 * Check that the default configuration for a Transformer created using a PrimedTransformer without an XSL Stylesheet.
+	 */
 	@Test
-	public void testPrimedTransformer_newTransformer_configurationSaxon() {
+	public void testPrimedTransformer_newTransformer_configurationDefault_stylesheetNone() {
 		
 		try {
 			
-			Transformer result = PrimedTransformer.newTransformer(null);			
-			assertEquals(true, result != null);
+			Transformer customTransformer = transformer.newTransformer();			
+			assertEquals(true, customTransformer != null);
+			assertEquals("class net.sf.saxon.IdentityTransformer", customTransformer.getClass().toString());
+			
+			// Prepare an XML String for transformation
+			Source xmlSource = transformer.parseToDOMSource(sampleFileHelloWorldSemantic);
+
+			// Prepare a StringWriter to write out the result of the transformation
+			StringWriter writer = new StringWriter();
+			
+			// Prepare a container to hold the result of the transformation
+			StreamResult streamResult = new StreamResult(writer);
+
+			// Execute a transformation without an XSLT stylesheet
+			customTransformer.transform(xmlSource, streamResult);
+
+			// Extract the result of the transformation from the container
+			String result = writer.toString();
+			
+			// Check that the XML hasn't changed as a result of the transformation
+			assertXMLEqual(sampleStringHelloWorldSemantic, result);
 			
 		} catch (TransformerConfigurationException e) {
+			fail(e.getMessage());
+		} catch (TransformerException e) {
+			fail(e.getMessage());
+		} catch (ParserConfigurationException e) {
+			fail(e.getMessage());
+		} catch (SAXException e) {
+			fail(e.getMessage());
+		} catch (IOException e) {
 			fail(e.getMessage());
 		}
 		
 	}
 	
+	/**
+	 * Check that the default configuration for a Transformer created using a PrimedTransformer with the XSL Stylesheet specified.
+	 */
+	@Test
+	public void testPrimedTransformer_newTransformer_configurationDefault_stylesheetReversed() {
+		
+		try {
+			
+			Transformer customTransformer = transformer.newTransformer(TestPrimedTransformer.xslReverse);			
+			assertEquals(true, customTransformer != null);
+			assertEquals("class net.sf.saxon.Controller", customTransformer.getClass().toString());
+			
+			// Prepare an XML String for transformation
+			Source xmlSource = transformer.parseToDOMSource(sampleFileHelloWorldSemantic);
+
+			// Prepare a StringWriter to write out the result of the transformation
+			StringWriter writer = new StringWriter();
+			
+			// Prepare a container to hold the result of the transformation
+			StreamResult streamResult = new StreamResult(writer);
+
+			// Execute a transformation without an XSLT stylesheet
+			customTransformer.transform(xmlSource, streamResult);
+
+			// Extract the result of the transformation from the container
+			String result = writer.toString();
+			
+			// Check that the XML has changed as a result of the transformation
+			assertXMLEqual(sampleStringHelloWorldSemanticReversed, result);
+			
+		} catch (TransformerConfigurationException e) {
+			fail(e.getMessage());
+		} catch (SAXException e) {
+			fail(e.getMessage());
+		} catch (IOException e) {
+			fail(e.getMessage());
+		} catch (ParserConfigurationException e) {
+			fail(e.getMessage());
+		} catch (TransformerException e) {
+			fail(e.getMessage());
+		}
+		
+	}
+	
+	/**
+	 * Check that the entity resolver is correctly set to the instance specified.
+	 */
+	@Test
+	public void testPrimedTransformer_setCatalogResolver() {							
+			
+						
+			XMLCatalogResolver resolver = new XMLCatalogResolver(new String[]{catalog.toURI().toString()});
+			transformer.setCatalogResolver(resolver);
+			
+			assertEquals(resolver, transformer.getCatalogResolver());			
+
+	}
+	
+	/**
+	 * Check that the PrimedTransformation correctly transforms the XML specified, using the XSL Stylesheet and parameters specified.
+	 */
+	@Test
+	public void testPrimedTransformer_transform_withStylesheet_withParams_withoutListener() {
+		
+		try {							
+			
+			// Create a container to hold the parameters
+			TreeMap<String, String> params = new TreeMap<String, String>();
+			params.put("wrapper", "document");
+			params.put("message", "Hello World!");
+			params.put("test", null);
+
+			// Prepare a StringWriter to write out the result of the transformation
+			StringWriter writer = new StringWriter();
+			
+			// Prepare a container to hold the result of the transformation
+			StreamResult streamResult = new StreamResult(writer);
+
+			// Execute a transformation 
+			transformer.transform(sampleFileHelloWorldSemantic, xslWrapMessage, streamResult, params, null);
+
+			// Extract the result of the transformation from the container
+			String result = writer.toString();						
+			
+			// Check that the XML has changed as a result of the transformation			
+			assertXMLEqual(sampleStringHelloWorldPlain, result);
+			
+		} catch (TransformerException e) {
+			fail(e.getMessage());		
+		} catch (SAXException e) {
+			fail(e.getMessage());
+		} catch (IOException e) {
+			fail(e.getMessage());
+		} catch (ParserConfigurationException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Check that the PrimedTransformation correctly transforms the XML specified, using the XSL Stylesheet, parameters and listener specified.
+	 */
+	@Test
+	public void testPrimedTransformer_transform_withStylesheet_withParams_withListener() {
+		
+		// Instantiate an ErrorListener
+		CustomErrorListener listener = new CustomErrorListener();
+		
+		// Prepare a StringWriter to write out the result of the transformation
+		StringWriter writer = new StringWriter();
+		
+		try {										
+			
+			// Prepare a container to hold the result of the transformation
+			StreamResult streamResult = new StreamResult(writer);
+
+			// Execute a transformation 
+			transformer.transform(sampleFileHelloWorldPlain, xslError, streamResult, null, listener);						
+			
+			fail("TransformerException not thrown.");
+			
+		} catch (TransformerException e) {
+			
+			assertEquals(1, listener.getTotalExceptions());
+			assertEquals(0, listener.getTotalWarnings());
+			assertEquals(0, listener.getTotalErrors());
+			assertEquals(1, listener.getTotalFatalErrors());
+
+			// Extract the result of the transformation from the container
+			String result = writer.toString();								
+			
+			// Check that the XML has changed as a result of the transformation							
+			assertEquals(prologString, result);							
+			
+		} catch (SAXException e) {
+			fail(e.getMessage());
+		} catch (IOException e) {
+			fail(e.getMessage());
+		} catch (ParserConfigurationException e) {
+			fail(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Check that the default configuration of the PrimedTransformation is as expected.
+	 */
 	@Test
 	public void testPrimedTransformer_configurationDefault() {
 		
@@ -316,7 +636,7 @@ public class TestPrimedTransformer {
 		assertEquals(PrimedTransformer.SET_NAMESPACE_AWARE, initialDocumentBuilderFactory.isNamespaceAware());
 		assertEquals(PrimedTransformer.SET_VALIDATING, initialDocumentBuilderFactory.isValidating());
 		assertEquals(PrimedTransformer.SET_XINCLUDE_AWARE, initialDocumentBuilderFactory.isXIncludeAware());
-		assertEquals(PrimedTransformer.SET_IGNORING_ELEMENT_CONTENT_WHITESPACE, initialDocumentBuilderFactory.isIgnoringElementContentWhitespace());
+		assertEquals(PrimedTransformer.SET_IGNORING_ELEMENT_CONTENT_WHITESPACE, initialDocumentBuilderFactory.isIgnoringElementContentWhitespace());		
 		
 		/*
 		 *  Check the configuration of the DocumentBuilder
@@ -326,7 +646,9 @@ public class TestPrimedTransformer {
 		assertNotNull(initialDocumentBuilder);
 		assertEquals(PrimedTransformer.SET_NAMESPACE_AWARE, initialDocumentBuilder.isNamespaceAware());
 		assertEquals(PrimedTransformer.SET_VALIDATING, initialDocumentBuilder.isValidating());
-		assertEquals(PrimedTransformer.SET_XINCLUDE_AWARE, initialDocumentBuilder.isXIncludeAware());	
+		assertEquals(PrimedTransformer.SET_XINCLUDE_AWARE, initialDocumentBuilder.isXIncludeAware());			
+		
+		initialDocumentBuilder.setEntityResolver(resolver);
 		
 		// Check that the DocumentBuilder is expanding character entity references.
 		try {
@@ -354,7 +676,14 @@ public class TestPrimedTransformer {
 		assertNotNull(initialTransformerFactory);
 		assertEquals(PrimedTransformer.SET_XINCLUDE_AWARE, initialTransformerFactory.getAttribute(FeatureKeys.XINCLUDE));
 		assertEquals(!PrimedTransformer.SET_VALIDATING, initialTransformerFactory.getAttribute(FeatureKeys.VALIDATION_WARNINGS));
-				
+		
+		/*
+		 *  Check the configuration of the Transformer
+		 *  immediately after an instance of PrimedTransformer has been constructed. 
+		 */		
+		Transformer initialTransformer = transformer.getTransformer();		
+		assertNotNull(initialTransformer);		
+		
 	}
 	
 }

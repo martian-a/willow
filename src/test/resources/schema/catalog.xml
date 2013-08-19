@@ -1,0 +1,14 @@
+<!DOCTYPE catalog
+  PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN"
+         "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+
+    <group xml:base="http://xml.kaikoda.com/schema/">
+        <public publicId="-//KAIKODA//DTD DOCUMENT 1.0//EN" uri="document.dtd" />
+    </group>
+    
+    <group xml:base="${project.build.testOutputDirectory}/schema/">
+        <system systemId="../../schema/document.dtd" uri="document.dtd" />
+    </group>
+    
+</catalog>
