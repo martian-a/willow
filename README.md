@@ -1,4 +1,4 @@
 willow
 ======
 
-A utility that packages together functionality that I commonly required when working with XML.
+A utility that packages together functionality that I commonly require when working with XML.
