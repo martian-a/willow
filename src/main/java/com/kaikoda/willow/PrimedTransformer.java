@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
  * @author Sheila Ellen Thomson
  * 
  */
-class PrimedTransformer {
+public class PrimedTransformer {
 
 	/**
 	 * The string identifying the default TransformerFactoryImpl used by
