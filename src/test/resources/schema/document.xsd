@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema 
+    xmlns:xml="http://www.w3.org/XML/1998/namespace"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+    elementFormDefault="qualified" 
+    xml:lang="en">
+    
+    <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd" />
+    
+    <xs:element name="document">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="p"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="xml:specialAttrs" />
+        </xs:complexType>        
+    </xs:element>
+    
+    <xs:element name="p">
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="span"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="xml:specialAttrs" />
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="span">
+        <xs:complexType mixed="true">
+            <xs:sequence>
+                <xs:element minOccurs="0" maxOccurs="unbounded" ref="span"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="xml:specialAttrs" />
+            <xs:attributeGroup ref="attlist.class"/>
+        </xs:complexType>
+    </xs:element>
+    
+    <xs:attributeGroup name="attlist.class">
+        <xs:attribute name="class"/>
+    </xs:attributeGroup>
+    
+</xs:schema>

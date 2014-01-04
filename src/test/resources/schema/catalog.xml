@@ -11,4 +11,20 @@
         <system systemId="../../schema/document.dtd" uri="document.dtd" />
     </group>
     
+    <group xml:base="http://xml.kaikoda.com/schema/">
+        <public publicId="-//KAIKODA//XSD DOCUMENT 1.0//EN" uri="document.xsd" />
+    </group>
+    
+    <group xml:base="${project.build.testOutputDirectory}/schema/">
+        <system systemId="../../schema/document.xsd" uri="document.xsd" />
+    </group>
+    
+    <group xml:base="http://xml.kaikoda.com/schema/">
+        <public publicId="http://www.w3.org/XML/1998/namespace" uri="xml.xsd" />
+    </group>
+    
+    <group xml:base="${project.build.testOutputDirectory}/schema/">
+        <system systemId="../../schema/xml.xsd" uri="xml.xsd" />
+    </group>
+    
 </catalog>

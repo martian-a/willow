@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-model href="../../schema/document.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<document>
+    <!-- Hello World! -->
+    <p><span class="greeting" xml:base="hello.xml">Hello</span><span class="delimiter"> </span><span class="audience">World</span>!</p>    
+</document>

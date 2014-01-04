@@ -85,7 +85,7 @@ public class PrimedTransformer {
 	/**
 	 * The DocumentBuilder used when creating a DOM Document.
 	 */
-	private final DocumentBuilder documentBuilder;
+	private DocumentBuilder documentBuilder;
 
 	/**
 	 * The DocumentBuilderFactory used when instantiating a new DocumentBuilder
@@ -366,6 +366,17 @@ public class PrimedTransformer {
 	public void setCatalogResolver(XMLCatalogResolver resolver) {
 		this.catalogResolver = resolver;
 		this.documentBuilder.setEntityResolver(this.catalogResolver);
+	}
+
+	/**
+	 * Changes the instance of DocumentBuilder used by this instance of
+	 * PrimedTransformer.
+	 * 
+	 * @param builder
+	 *            the DocumentBuilder to use when building DOM Documents.
+	 */
+	public void setDocumentBuilder(DocumentBuilder builder) {
+		this.documentBuilder = builder;
 	}
 
 	/**
